@@ -1,21 +1,21 @@
-name: Sprint5 Full Automation 
+name: Sprint5 Full Automation
  
-on: 
-  push: 
-    branches: [ "main" ] 
- 
-jobs: 
-  deploy: 
-    runs-on: ubuntu-latest 
-    steps: 
-      - name: Checkout 
-        uses: actions/checkout@v3 
- 
-      - name: Configurar credenciais AWS 
-        uses: aws-actions/configure-aws-credentials@v4 
-        with: 
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
@@ -24,8 +24,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.CHAVE_PEM }}" > ~/.ssh/chave_lab07.pem
           chmod 600 ~/.ssh/chave_lab07.pem
-          ls -l ~/.ssh
-
 
       - name: Instalar Terraform
         run: |
@@ -39,23 +37,31 @@ jobs:
       - name: Instalar Ansible e dependências
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y software-properties-common
-          sudo apt-add-repository --yes --update ppa:ansible/ansible
           sudo apt-get install -y ansible python3-pip
           pip install boto3 pandas
           ansible --version
- 
-      - name: Terraform Apply 
-        run: | 
-          cd infra 
-          terraform init 
-          terraform apply -auto-approve 
- 
-      - name: Configurar EC2 com Ansible 
-        run: | 
-          cd ansible 
-          ansible-playbook -i inventory setup.yml 
- 
-      - name: Executar pipeline de dados 
-        run: | 
+
+      - name: Terraform Apply
+        run: |
+          cd infra
+          terraform init
+          terraform apply -auto-approve
+        env:
+          TF_VAR_key_path: ~/.ssh/chave_lab07.pem
+
+      - name: Aguardar EC2 ficar acessível (SSH)
+        run: |
+          echo "Aguardando EC2 iniciar..."
+          sleep 60
+          cd ansible
+          echo "Testando conexão SSH..."
+          ansible -i inventory ec2 -m ping || exit 1
+
+      - name: Configurar EC2 com Ansible
+        run: |
+          cd ansible
+          ansible-playbook -i inventory setup.yml
+
+      - name: Executar pipeline de dados
+        run: |
           python scripts/data_pipeline.py

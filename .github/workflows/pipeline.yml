@@ -18,6 +18,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }} 
+
+      - name: Instalar Terraform
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.9.5/terraform_1.9.5_linux_amd64.zip
+          unzip terraform_1.9.5_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform -v
  
       - name: Terraform Apply 
         run: | 

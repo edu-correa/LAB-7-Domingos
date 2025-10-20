@@ -30,8 +30,8 @@ jobs:
       - name: Configurar EC2 com Ansible
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.CHAVE_PEM }}" > ~/.ssh/control-node-sprint5.pem
-          chmod 400 ~/.ssh/control-node-sprint5.pem
+          echo "${{ secrets.CHAVE_PEM }}" > ~/.ssh/chave_lab07.pem
+          chmod 400 ~/.ssh/chave_lab07.pem
           cd ansible
           ansible-playbook -i inventory setup.yml
       - name: Executar pipeline de dados

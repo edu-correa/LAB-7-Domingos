@@ -1,22 +1,26 @@
 - hosts: ec2
-  gather_facts: no      
+  gather_facts: no
   become: yes
   tasks:
-    - name: Garantir que o Python 3 está instalado (bootstrapping)
+    - name: Instalar Python 3 (bootstrap)
       raw: |
-        if ! command -v python3 &> /dev/null; then
+        if ! command -v python3 > /dev/null 2>&1; then
           sudo yum install -y python3
         fi
       changed_when: false
 
     - name: Instalar pacotes básicos
       yum:
-        name: [python3, python3-pip]
+        name:
+          - python3
+          - python3-pip
         state: present
 
     - name: Instalar bibliotecas Python
       pip:
-        name: [boto3, pandas]
+        name:
+          - boto3
+          - pandas
 
     - name: Criar diretórios de dados
       file:

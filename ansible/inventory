@@ -1,2 +1,3 @@
-[ec2]
-3.91.150.255 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/chave_lab07.pem ansible_python_interpreter=/usr/bin/python3 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+[webservers]
+Sprint5-EC2 ansible_host={{ lookup('pipe', 'aws ec2 describe-instances --filters "Name=tag:Name,Values=my-instance-name" --query "Reservations[].Instances[].[PublicIpAddress]" --output json | jq -r ".[0]"') }}
+18.208.157.14 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/chave_lab07.pem 

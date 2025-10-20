@@ -16,8 +16,26 @@ jobs:
         with: 
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }} 
-          aws-session-token: ${{ secrets.AWS-SESSION-TOKEN }}
+
+      - name: Instalar Terraform
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.9.5/terraform_1.9.5_linux_amd64.zip
+          unzip terraform_1.9.5_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform -v
+
+      - name: Instalar Ansible e dependências
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository --yes --update ppa:ansible/ansible
+          sudo apt-get install -y ansible python3-pip
+          pip install boto3 pandas
+          ansible --version
  
       - name: Terraform Apply 
         run: | 

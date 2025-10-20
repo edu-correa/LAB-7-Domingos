@@ -1,4 +1,5 @@
 - hosts: ec2
+  gather_facts: no      
   become: yes
   tasks:
     - name: Garantir que o Python 3 está instalado (bootstrapping)
